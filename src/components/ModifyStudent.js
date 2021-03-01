@@ -2,6 +2,7 @@ import React from 'react';
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
 import style from './NewStudent.module.css';
 import { useSelector, useDispatch } from 'react-redux';
+import { useHistory } from "react-router-dom";
 import { editingImg,
         editingName,
         editingDayAdmission,
@@ -11,6 +12,7 @@ import { editingImg,
     } from '../action/actionCreator';
 
 export default function ModifyStudent() {
+    const history = useHistory();
     const studentisModified = useSelector(state => state.students.studentisModified);
     const editorName = useSelector(state => state.students.studentisModified.name);
     const editorPhoneNumber = useSelector(state => state.students.studentisModified.phoneNumber);
@@ -33,11 +35,11 @@ export default function ModifyStudent() {
             }
         } else localStorage.setItem('modifiedList', JSON.stringify([studentisModified]));
         localStorage.removeItem('studentModifying');
-        window.location.replace("/");
+        history.push('/')
     }
     const handleCancelModify = () => {
         localStorage.removeItem('studentModifying');
-        window.location.replace("/");
+        history.push('/')
     }
     const checkMale = () => {
         if (editorGender === "Nam") return true

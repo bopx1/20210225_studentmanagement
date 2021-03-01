@@ -1,6 +1,6 @@
 import studentData  from "../studentData";
 import { actionType } from '../action/actionType';
-
+import { STUDENTS_LIST } from "../constants/LocalStorageItem";
 
 const getStudentModify = () => {
     const student = localStorage.getItem('studentModifying');
@@ -18,19 +18,12 @@ const getStudentModify = () => {
     }
 }
 
-const setStudentList = () => {
-    const modifiedList = localStorage.getItem('modifiedList');
-    const addedList = localStorage.getItem('addedList');
-    if (modifiedList && addedList) 
-        return studentData.map(student => JSON.parse(modifiedList)
-        .find(item => item.id === student.id) || student)
-        .concat(JSON.parse(addedList));
-    else if (modifiedList && !addedList) 
-        return studentData.map(student => JSON.parse(modifiedList)
-        .find(item => item.id === student.id) || student);
-    else if (!modifiedList && addedList)
-        return studentData.concat(JSON.parse(addedList));
-    else return studentData;
+const getStudentList = () => {
+    const studentsList = localStorage.getItem(STUDENTS_LIST);
+    if(!studentsList){
+        localStorage.setItem(STUDENTS_LIST, JSON.stringify(studentData));
+    }
+    return studentsList ? JSON.parse(studentsList) : studentData;
 }
 
 const initialState = {
@@ -45,13 +38,19 @@ const initialState = {
         img: './studentImg/default.png'
     },
     studentisModified: getStudentModify(),
-    studentList : setStudentList(),
-    totalStudent: setStudentList().length,
+    studentList : getStudentList(),
+    totalStudent: getStudentList().length,
     studentMatchedWithSearch: []
 }
 
 export const students = (state = initialState, action) => {
     switch(action.type) {
+        case actionType.ADDNEW_STUDENT: {
+            return {
+                ...state,
+                studentList: action.payload.students
+            }
+        }
         case actionType.SEARCH_STUDENT: {
             return {
                 ...state,

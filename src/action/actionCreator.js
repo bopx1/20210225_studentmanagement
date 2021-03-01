@@ -46,6 +46,15 @@ export const searchStudent = (studentsMatched) => (
     }
 )
 
+export const addStudent = (students) => (
+    {
+        type: actionType.ADDNEW_STUDENT,
+        payload: {
+            students
+        }
+    }
+)
+
 export const editingImg = urlImg => (
     {
         type: actionType.MODIFY_STUDENT.EDITING_IMG,
