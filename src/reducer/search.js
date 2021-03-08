@@ -1,19 +1,15 @@
 import { actionType } from '../action/actionType';
 
-export const pagination = (state = {
-    currentPage: 1,
+export const search = (state = {
+    searchValue: ''
 }, action) => {
     switch(action.type) {
-        case actionType.MOVE_EXACTLY_TO_PAGE: {
+        case (actionType.CHANGE_SEARCHING_VALUE): {
             return {
                 ...state,
-                currentPage: action.payload.page,
+                searchValue: action.payload.value
             }
-         
         }
-
         default: return state;
     }
 }
-
-

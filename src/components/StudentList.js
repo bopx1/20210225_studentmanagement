@@ -1,28 +1,40 @@
-import React from "react";
+import React, { useEffect } from "react";
 import style from "./StudentList.module.css";
 import StudentItem from "./StudentItem";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { appConstants } from "../constants";
+import { refreshStudentList } from "../action/actionCreator";
 
 export default function StudentList() {
-  const totalStudent = useSelector((state) => state.students.totalStudent);
+  const dispatch = useDispatch();
+  const studentList = useSelector((state) => state.students.studentList);
   const currentPage = useSelector((state) => state.pagination.currentPage);
-  const studentMatchedWithSearch = useSelector(
-    (state) => state.students.studentMatchedWithSearch
-  );
-  const filterStudentIndex = () =>
-    [
-      (currentPage - 1) * 6,
-      (currentPage - 1) * 6 + 1,
-      (currentPage - 1) * 6 + 2,
-      (currentPage - 1) * 6 + 3,
-      (currentPage - 1) * 6 + 4,
-      (currentPage - 1) * 6 + 5,
-    ].filter((page) => page < totalStudent);
+  const searchValue = useSelector((state) => state.search.searchValue);
 
-  const renderSearchedList = () =>
-    studentMatchedWithSearch.map((student) => (
+  useEffect(() => {
+    async function fetchData() {
+      dispatch(refreshStudentList());
+    }
+    fetchData();
+  }, [dispatch, searchValue, currentPage]);
+
+  const studentMatchSearch = studentList
+    .filter(
+      (student) =>
+        student.name.includes(searchValue) ||
+        student.phoneNumber.includes(searchValue)
+    );
+
+  const renderStudentList = () =>
+    studentMatchSearch.map((student) => (
       <StudentItem key={student.id} student={student} />
     ));
 
-  return <div className={style.list}>{renderSearchedList()}</div>;
+  if (studentMatchSearch.length === 0) {
+    return (
+      <div className={style.list}>
+        <p>Không tìm thấy kết quả nào</p>
+      </div>
+    );
+  } else return <div className={style.list}>{renderStudentList()}</div>;
 }

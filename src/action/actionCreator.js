@@ -1,170 +1,68 @@
-import { actionType } from './actionType';
+import { appConstants } from "../constants";
+import { getStudent } from "../studentService";
+import { actionType } from "./actionType";
 
-export const moveToPreViousPage = () => (
-    {
-        type: actionType.MOVE_TO_PREVIOUSPAGE,
-        payload: {}
+export const refreshStudentList = () => {
+  return async function (dispatch, getState) {
+    const state = getState();
+    const searchValue = state.search.searchValue;
+    const currentPage = state.pagination.currentPage;
+    const pageSize = appConstants.pageSize;
+    try {
+        console.log(currentPage);
+      dispatch(startRefreshStudentList());
+      const response = await getStudent(searchValue, currentPage, pageSize);
+      let data = response.data;
+      dispatch(refreshStudentListSuccess(data.data, data.meta.totalItem));
+    } catch (ex) {
+      console.log(ex);
+      dispatch(refreshStudentListFailed());
     }
-)
+  };
+};
 
-export const moveToNextPage = () => (
-    {
-        type: actionType.MOVE_TO_NEXTPAGE,
-        payload: {}
-    }
-)
+export const startRefreshStudentList = () => ({
+  type: actionType.START_REFRESH_LOADING_STUDENT,
+  payload: {},
+});
 
-export const moveExactlyToPage = page => (
-    {
-        type: actionType.MOVE_EXACTLY_TO_PAGE,
-        payload: {
-            page,
-        }
-    }
-)
+export const refreshStudentListSuccess = (newStudentList, totalItem) => ({
+  type: actionType.REFRESH_STUDENT_LIST_SUCCESS,
+  payload: {
+    newStudentList,
+    totalItem
+  },
+});
 
-export const increasePageNumber = () => (
-    {
-        type: actionType.INCREASE_PAGENUMBER,
-        payload: {}
-    }
-)
+export const refreshStudentListFailed = () => ({
+  type: actionType.REFRESH_STUDENT_LIST_FAILED,
+  payload: {},
+});
 
-export const decreasePageNumber = () => (
-    {
-        type: actionType.DECREASE_PAGENUMBER,
-        payload: {}
-    }
-)
+export const moveExactlyToPage = (page) => ({
+  type: actionType.MOVE_EXACTLY_TO_PAGE,
+  payload: {
+    page,
+  },
+});
 
-export const searchStudent = (studentsMatched) => (
-    {
-        type: actionType.SEARCH_STUDENT,
-        payload: {
-            studentsMatched
-        }
-    }
-)
+export const changeSearchingValue = (value) => ({
+  type: actionType.CHANGE_SEARCHING_VALUE,
+  payload: {
+    value,
+  },
+});
 
-export const addStudent = (students) => (
-    {
-        type: actionType.ADDNEW_STUDENT,
-        payload: {
-            students
-        }
-    }
-)
+export const editStudent = (modifiedStudent) => ({
+  type: actionType.MODIFY_STUDENT.SAVE,
+  payload: {
+    modifiedStudent,
+  },
+});
 
-export const editingImg = urlImg => (
-    {
-        type: actionType.MODIFY_STUDENT.EDITING_IMG,
-        payload: {
-            urlImg
-        }
-    }
-)
-
-export const editingName = name => (
-    {
-        type: actionType.MODIFY_STUDENT.EDITING_NAME,
-        payload: {
-            name
-        }
-    }
-)
-
-export const editingPhoneNumber = phoneNumber => (
-    {
-        type: actionType.MODIFY_STUDENT.EDITING_PHONENUMBER,
-        payload: {
-            phoneNumber
-        }
-    }
-)
-
-export const editingBirthday = birthday => (
-    {
-        type: actionType.MODIFY_STUDENT.EDITING_BIRTHDAY,
-        payload: {
-            birthday
-        }
-    }
-)
-
-export const editingDayAdmission = dayAdmission => (
-    {
-        type: actionType.MODIFY_STUDENT.EDITING_DAYADMISSION,
-        payload: {
-            dayAdmission
-        }
-    }
-)
-
-export const editingGender = gender => (
-    {
-        type: actionType.MODIFY_STUDENT.EDITING_GENDER,
-        payload: {
-            gender
-        }
-    }
-)
-
-export const addingImg = urlImg => (
-    {
-        type: actionType.ADD_STUDENT.ADDING_IMG,
-        payload: {
-            urlImg
-        }
-    }
-)
-
-export const addingName = name => (
-    {
-        type: actionType.ADD_STUDENT.ADDING_NAME,
-        payload: {
-            name
-        }
-    }
-)
-
-export const addingPhoneNumber = phoneNumber => (
-    {
-        type: actionType.ADD_STUDENT.ADDING_PHONENUMBER,
-        payload: {
-            phoneNumber
-        }
-    }
-)
-
-export const addingDayAdmission = dayAdmission => (
-    {
-        type: actionType.ADD_STUDENT.ADDING_DAYADMISSION,
-        payload: {
-            dayAdmission
-        }
-    }
-)
-
-export const addingBirthday = birthday => (
-    {
-        type: actionType.ADD_STUDENT.ADDING_BIRTHDAY,
-        payload: {
-            birthday
-        }
-    }
-)
-
-export const addingGender = gender => (
-    {
-        type: actionType.ADD_STUDENT.ADDING_GENDER,
-        payload: {
-            gender
-        }
-    }
-)
-
-
-
-
-
-
+export const saveStudent = (newStudent) => ({
+  type: actionType.ADD_STUDENT.SAVE,
+  payload: {
+    newStudent,
+  },
+});

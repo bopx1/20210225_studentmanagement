@@ -1,185 +1,184 @@
 import React from "react";
+import { Modal, Button, Space } from "antd";
 import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
+import { ExclamationCircleOutlined } from "@ant-design/icons";
 import style from "./NewStudent.module.css";
-import { useSelector, useDispatch } from "react-redux";
+import { Formik, Field, ErrorMessage } from "formik";
+import { useDispatch } from "react-redux";
+import { saveStudent } from "../action/actionCreator";
 import { useHistory } from "react-router-dom";
-import { STUDENTS_LIST } from "../constants/LocalStorageItem";
-import {
-  addingBirthday,
-  addingDayAdmission,
-  addingGender,
-  addingImg,
-  addingPhoneNumber,
-  addingName,
-  addStudent,
-} from "../action/actionCreator";
+import { Utils } from "../utils/Utils";
+import * as Yup from "yup";
+
+const { confirm } = Modal;
+
+function showConfirm(onOk, onCancel) {
+  confirm({
+    title: "Bạn có thực sự muốn huỷ?",
+    icon: <ExclamationCircleOutlined />,
+    content: "Các thay đổi sẽ không được lưu",
+    okType: "default",
+    cancelButtonProps: {
+      type: "primary",
+    },
+    onOk() {
+      onOk();
+    },
+    onCancel() {
+      onCancel();
+    },
+  });
+}
 
 export default function NewStudent() {
-  const history = useHistory();
-  const newStudent = useSelector((state) => state.students.newStudent);
-  const imgAdding = useSelector((state) => state.students.newStudent.img);
-  const nameAdding = useSelector((state) => state.students.newStudent.name);
-  const studentList = useSelector((state) => state.students.studentList);
-  const birthdayAdding = useSelector(
-    (state) => state.students.newStudent.birthday
-  );
-  const phoneNumberAdding = useSelector(
-    (state) => state.students.newStudent.phoneNumber
-  );
-  const dayAdmissionAdding = useSelector(
-    (state) => state.students.newStudent.dayAdmission
-  );
-  const genderAdding = useSelector((state) => state.students.newStudent.gender);
-
   const dispatch = useDispatch();
+  const history = useHistory();
 
-  const handleAddStudent = () => {
-    const localStorageStudentList = localStorage.getItem(STUDENTS_LIST);
-    newStudent.id = Math.floor(Math.random() * 100000);
-    if (localStorageStudentList) {
-      let newStudentList = [...studentList, newStudent];
-      dispatch(addStudent(newStudentList));
-      localStorage.setItem(STUDENTS_LIST, JSON.stringify(newStudentList));
-    } else localStorage.setItem(STUDENTS_LIST, JSON.stringify(studentList));
-    backtoHomePage();
+  const handleSaveAdded = (values) => {
+    dispatch(saveStudent(values));
+    history.push("/");
   };
 
-  const backtoHomePage = () => history.push("/");
-
-  const handleUploadImage = (objImg) => {
-    if (objImg) {
-      const urlImg = URL.createObjectURL(objImg);
-      dispatch(addingImg(urlImg));
-    } else return;
-  };
-
-  const handleAddName = (name) => {
-    if (name) dispatch(addingName(name));
-    else return;
-  };
-
-  const handleAddPhoneNumber = (phoneNumber) => {
-    if (phoneNumber) dispatch(addingPhoneNumber(phoneNumber));
-    else return;
-  };
-
-  const handleAddBirthday = (birthday) => {
-    if (birthday) dispatch(addingBirthday(birthday));
-    else return;
-  };
-
-  const handleAddDayAdmission = (dayAdmission) => {
-    if (dayAdmission) dispatch(addingDayAdmission(dayAdmission));
-    else return;
-  };
-
-  const handleAddGender = (gender, checked) => {
-    if (checked) dispatch(addingGender(gender));
-    else return;
-  };
-
-  const checkMale = () => {
-    if (genderAdding === "Nam") return true;
-    else return false;
-  };
-  const checkFemale = () => {
-    if (genderAdding === "Nữ") return true;
-    else return false;
+  const handleCancelAdding = (dirty) => {
+    if (!dirty) history.push("/");
+    else
+      showConfirm(
+        () => history.push("/"),
+        () => {}
+      );
   };
 
   return (
     <div className={style.newStudent}>
-      <div className={style.topbar} onClick={backtoHomePage}>
-        <ArrowBackIosIcon className={style.arrowIcon} />
-        <h2>Danh sách</h2>
-      </div>
-      <form className={style.form}>
-        <div className={style.firstContent}>
-          <div className={style.img_container}>
-            <label htmlFor="imageUpload">
-              <input
-                type="file"
-                id="imageUpload"
-                className={style.file}
-                onChange={(e) => handleUploadImage(e.target.files[0])}
-              />
-              <img src={imgAdding} alt={nameAdding} />
-            </label>
-          </div>
-          <input
-            className={style.standard2}
-            type="text"
-            value={nameAdding}
-            onChange={(e) => handleAddName(e.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="">Ngày sinh</label>
-          <input
-            className={style.standard1}
-            type="date"
-            id="dateOfBirth"
-            name="dateOfBirth"
-            value={birthdayAdding}
-            onChange={(e) => handleAddBirthday(e.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="gender">Giới tính</label>
-          <div className={style.gender}>
-            <div>
-              <input
-                className={style.standard3}
-                type="checkbox"
-                checked={checkMale()}
-                value="Nam"
-                onChange={(e) =>
-                  handleAddGender(e.target.value, e.target.checked)
-                }
-              />
-              <label htmlFor="Nam">Nam</label>
-            </div>
-            <div>
-              <input
-                className={style.standard3}
-                type="checkbox"
-                checked={checkFemale()}
-                value="Nữ"
-                onChange={(e) =>
-                  handleAddGender(e.target.value, e.target.checked)
-                }
-              />
-              <label htmlFor="Nữ">Nữ</label>
-            </div>
-          </div>
-        </div>
-        <div>
-          <label htmlFor="dateAdmission">Ngày nhập học</label>
-          <input
-            className={style.standard1}
-            type="date"
-            value={dayAdmissionAdding}
-            onChange={(e) => handleAddDayAdmission(e.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="phoneNumber">Điện thoại</label>
-          <input
-            className={style.standard1}
-            type="text"
-            value={phoneNumberAdding}
-            onChange={(e) => handleAddPhoneNumber(e.target.value)}
-          />
-        </div>
-      </form>
-      <div className={style.button_group}>
-        <button className={style.add_butt} onClick={handleAddStudent}>
-          Thêm
-        </button>
-        <button className={style.cancel_butt} onClick={backtoHomePage}>
-          Huỷ
-        </button>
-      </div>
+      <Formik
+        initialValues={{
+          img: "default.png",
+          name: "",
+          phoneNumber: "",
+          birthday: "",
+          gender: "",
+          dayAdmission: "",
+        }}
+        validationSchema={Yup.object().shape({
+          img: Yup.string().required(),
+          name: Yup.string()
+            .required("Vui lòng nhập tên")
+            .matches(
+              /^[^`~!@#$%^&*()_+={}[\]|\\:;“’<,>.?๐฿]*$/,
+              "Tên không được chứa ký tự đặc biệt"
+            ),
+          phoneNumber: Yup.string()
+            .required("Vui lòng nhập số điện thoại")
+            .matches(
+              /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/,
+              "Số điện thoại không hợp lệ "
+            ),
+          birthday: Yup.string().required("Vui lòng nhập ngày sinh"),
+          gender: Yup.string().required("Vui lòng chọn giới tính"),
+          dayAdmission: Yup.string().required("Vui lòng chọn ngày nhập học"),
+        })}
+        onSubmit={handleSaveAdded}
+      >
+        {({ values, setFieldValue, handleSubmit, isValid, dirty }) => {
+          return (
+            <React.Fragment>
+              <div
+                className={style.topbar}
+                onClick={() => handleCancelAdding(dirty)}
+              >
+                <ArrowBackIosIcon className={style.arrowIcon} />
+                <h2>Danh sách</h2>
+              </div>
+              <form className={style.form}>
+                <div className={style.firstContent}>
+                  <div className={style.img_container}>
+                    <label htmlFor="imageUpload">
+                      <input
+                        type="file"
+                        id="imageUpload"
+                        className={style.file}
+                        onChange={(e) => {
+                          const urlImg = URL.createObjectURL(e.target.files[0]);
+                          setFieldValue("img", urlImg, true);
+                        }}
+                      />
+                      <img
+                        src={Utils.getAvatarUrlFromFileName(values.img)}
+                        alt={values.name}
+                      />
+                    </label>
+                  </div>
+                  <Field className={style.standard2} name="name" type="text" />
+                </div>
+                <ErrorMessage name="name" />
+                <div>
+                  <label htmlFor="">Ngày sinh</label>
+                  <Field
+                    className={style.standard1}
+                    type="date"
+                    name="birthday"
+                  />
+                </div>
+                <ErrorMessage name="birthday" />
+                <div>
+                  <label htmlFor="gender">Giới tính</label>
+                  <div className={style.gender}>
+                    <div className={style.manCheckBox}>
+                      <Field
+                        className={style.standard3}
+                        type="radio"
+                        name="gender"
+                        value="Nam"
+                      />
+                      <label htmlFor="Nam">Nam</label>
+                    </div>
+                    <div>
+                      <Field
+                        className={style.standard3}
+                        type="radio"
+                        name="gender"
+                        value="Nữ"
+                      />
+                      <label htmlFor="Nữ">Nữ</label>
+                    </div>
+                  </div>
+                </div>
+                <ErrorMessage name="gender" />
+                <div>
+                  <label htmlFor="dateAdmission">Ngày nhập học</label>
+                  <Field
+                    className={style.standard1}
+                    type="date"
+                    name="dayAdmission"
+                  />
+                </div>
+                <ErrorMessage name="dayAdmission" />
+                <div>
+                  <label htmlFor="phoneNumber">Điện thoại</label>
+                  <Field
+                    className={style.standard1}
+                    type="text"
+                    name="phoneNumber"
+                  />
+                </div>
+                <ErrorMessage name="phoneNumber" />
+              </form>
+              <div className={style.button_group}>
+                <Space>
+                  <Button
+                    disabled={!isValid}
+                    type="primary"
+                    onClick={handleSubmit}
+                  >
+                    Thêm
+                  </Button>
+                  <Button onClick={() => handleCancelAdding(dirty)}>Huỷ</Button>
+                </Space>
+              </div>
+            </React.Fragment>
+          );
+        }}
+      </Formik>
     </div>
   );
 }

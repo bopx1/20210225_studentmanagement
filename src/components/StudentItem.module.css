@@ -7,13 +7,14 @@
     border-radius: 10px;
     cursor: pointer;
     width: 90%;
-    margin: 0 auto 2vh auto;
-    height: 9vh;
+    margin: 0 auto 2.2vh auto;
+    height: 9.2vh;
 }
 
 .studentItem .img_container {
     flex: 0 0 15%;
 }
+
 
 .studentItem .details_area {
     flex: 0 0 60%;

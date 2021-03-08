@@ -7,17 +7,17 @@
 }
 
 .header .top_area {
-    flex: 0 0 45%;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #66c2ff;
+    background-color:#1890ff;
 }
 
 .header .top_area h2 {
     flex: 0 0 60%;
-    padding-left: 10px;
     color: white;
+    margin: 0px;
+    padding: 8px;
 }
 
 .header .top_area button {
@@ -49,6 +49,7 @@
     height: 60%;
     border: 1px solid grey;
     border-right: none;
+    padding-left: 5px;
 }
 
 .search_button {
